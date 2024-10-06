@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
-use std::io;
+use std::fs::{File, OpenOptions};
+use std::io::{self, Read, Write};
+use std::path::Path;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Todo {
@@ -11,6 +13,52 @@ struct Todo {
 #[derive(Debug, Serialize, Deserialize)]
 struct TodoList {
     todos: Vec<Todo>,
+}
+
+impl TodoList {
+    fn new() -> Self {
+        TodoList { todos: Vec::new() }
+    }
+
+    fn add_todo(&mut self, title: String) {
+        let id = self.todos.len() + 1;
+        let todo = Todo {
+            id,
+            title,
+            completed: false,
+        };
+
+        self.todos.push(todo);
+    }
+}
+
+// NOTE: function to save todos from the vector to a json file.
+// this function will return a emtpy result if it is Ok or an error.
+fn save_todos(todo_list: &TodoList) -> io::Result<()> {
+    let json = serde_json::to_string(&todo_list).unwrap();
+
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open("todos.json")?;
+
+    file.write_all(json.as_bytes())?;
+
+    Ok(())
+}
+
+fn load_todos() -> io::Result<TodoList> {
+    let path = Path::new("todos.json");
+    if path.exists() {
+        let mut file = File::open(path)?;
+        let mut contents = String::new();
+        file.read_to_string(&mut contents)?;
+        let todo_list: TodoList = serde_json::from_str(&contents)?;
+        Ok(todo_list)
+    } else {
+        Ok(TodoList::new())
+    }
 }
 
 fn main() {
@@ -33,7 +81,12 @@ fn main() {
 
     match choice.trim() {
         "1" => {
-            println!("Your choice is 1. Enter new Todo");
+            println!("1.Enter new Todo Title!");
+            let mut title = String::new();
+            io::stdin()
+                .read_line(&mut title)
+                .expect("Failed to read input.");
+            println!("Todo Added.");
         }
         "2" => {
             println!("Your choice is 2. Mark todo as done. ")
