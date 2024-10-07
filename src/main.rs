@@ -90,77 +90,81 @@ fn load_todos() -> io::Result<TodoList> {
 fn main() -> io::Result<()> {
     let mut todo_list = load_todos()?;
 
-    // NOTE: Give the user some brief insturctions using println for now.
-    println!("\nTodo CLI!");
-    println!("1. Add new Todo");
-    println!("2. Mark Todo as Complete.");
-    println!("3. Remove Todo.");
-    println!("4. List All Todos.");
-    println!("5. Exit!");
+    loop {
+        // NOTE: Give the user some brief insturctions using println for now.
+        println!("\nTodo CLI!");
+        println!("1. Add new Todo");
+        println!("2. Mark Todo as Complete.");
+        println!("3. Remove Todo.");
+        println!("4. List All Todos.");
+        println!("5. Exit!");
 
-    // NOTE: Take the user input as a string.
-    let mut choice = String::new();
+        // NOTE: Take the user input as a string.
+        let mut choice = String::new();
 
-    io::stdin()
-        .read_line(&mut choice)
-        .expect("Failed to read input.");
+        io::stdin()
+            .read_line(&mut choice)
+            .expect("Failed to read input.");
 
-    // NOTE: match the choice and give error if the choice is not matched.
+        // NOTE: match the choice and give error if the choice is not matched.
 
-    match choice.trim() {
-        "1" => {
-            println!("1.Enter new Todo Title!");
-            let mut title = String::new();
-            io::stdin()
-                .read_line(&mut title)
-                .expect("Failed to read input.");
-            todo_list.add_todo(title.trim().to_string());
-            println!("Todo Added.");
-        }
-        "2" => {
-            println!("2. Enter Id of the todo to be marked as complete. ");
-            let mut id = String::new();
-            io::stdin()
-                .read_line(&mut id)
-                .expect("Failed to read input.");
-            if let Ok(id) = id.trim().parse() {
-                if todo_list.complete_todo(id) {
-                    println!("Todo Completed.");
+        match choice.trim() {
+            "1" => {
+                println!("1.Enter new Todo Title!");
+                let mut title = String::new();
+                io::stdin()
+                    .read_line(&mut title)
+                    .expect("Failed to read input.");
+                todo_list.add_todo(title.trim().to_string());
+                println!("Todo Added.");
+            }
+            "2" => {
+                println!("2. Enter Id of the todo to be marked as complete. ");
+                let mut id = String::new();
+                io::stdin()
+                    .read_line(&mut id)
+                    .expect("Failed to read input.");
+                if let Ok(id) = id.trim().parse() {
+                    if todo_list.complete_todo(id) {
+                        println!("Todo Completed.");
+                    } else {
+                        println!("Todo not found!");
+                    }
                 } else {
-                    println!("Todo not found!");
+                    println!("Invalid ID");
                 }
-            } else {
-                println!("Invalid ID");
+            }
+            "3" => {
+                println!("3. Enter the id of the todo to be removed.");
+                let mut id = String::new();
+                io::stdin()
+                    .read_line(&mut id)
+                    .expect("Failed to read input.");
+                if let Ok(id) = id.trim().parse() {
+                    if todo_list.remove_todo(id) {
+                        println!("Todo Removed");
+                    } else {
+                        println!("Todo not found!");
+                    }
+                } else {
+                    println!("Invalid ID");
+                }
+            }
+            "4" => {
+                println!("4. List all todos");
+                todo_list.list_todos();
+            }
+            "5" => {
+                println!("5. Exit");
+                println!("Good Bye!");
+                break;
+            }
+            _ => {
+                println!("Invalid Choice.")
             }
         }
-        "3" => {
-            println!("3. Enter the id of the todo to be removed.");
-            let mut id = String::new();
-            io::stdin()
-                .read_line(&mut id)
-                .expect("Failed to read input.");
-            if let Ok(id) = id.trim().parse() {
-                if todo_list.remove_todo(id) {
-                    println!("Todo Removed");
-                } else {
-                    println!("Todo not found!");
-                }
-            } else {
-                println!("Invalid ID");
-            }
-        }
-        "4" => {
-            println!("4. List all todos");
-            todo_list.list_todos();
-        }
-        "5" => {
-            println!("Your choice is 5. Exit");
-        }
-        _ => {
-            println!("Invalid Choice.")
-        }
+        save_todos(&todo_list)?;
     }
-    save_todos(&todo_list)?;
 
     Ok(())
 }
