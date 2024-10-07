@@ -30,6 +30,15 @@ impl TodoList {
 
         self.todos.push(todo);
     }
+
+    fn complete_todo(&mut self, id: usize) -> bool {
+        if let Some(todo) = self.todos.iter_mut().find(|t| t.id == id) {
+            todo.completed = true;
+            true
+        } else {
+            false
+        }
+    }
 }
 
 // NOTE: function to save todos from the vector to a json file.
@@ -92,7 +101,18 @@ fn main() -> io::Result<()> {
             println!("Todo Added.");
         }
         "2" => {
-            println!("Your choice is 2. Mark todo as done. ")
+            println!("2. Enter Id of the todo to be marked as complete. ");
+            let mut id = String::new();
+            io::stdin()
+                .read_line(&mut id)
+                .expect("Failed to read input.");
+            if let Ok(id) = id.trim().parse() {
+                if todo_list.complete_todo(id) {
+                    println!("Todo Completed.");
+                } else {
+                    println!("Todo not found!");
+                }
+            }
         }
         "3" => {
             println!("Your choice is 3. Remove Todo.");
