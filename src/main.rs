@@ -39,6 +39,17 @@ impl TodoList {
             false
         }
     }
+
+    fn list_todos(&self) {
+        for todo in &self.todos {
+            println!(
+                "[{}] {}: {}",
+                todo.id,
+                todo.title,
+                if todo.completed { "✓" } else { "✗" }
+            );
+        }
+    }
 }
 
 // NOTE: function to save todos from the vector to a json file.
@@ -118,7 +129,8 @@ fn main() -> io::Result<()> {
             println!("Your choice is 3. Remove Todo.");
         }
         "4" => {
-            println!("Your choice is 4. List all todos");
+            println!("4. List all todos");
+            todo_list.list_todos();
         }
         "5" => {
             println!("Your choice is 5. Exit");
