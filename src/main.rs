@@ -50,6 +50,12 @@ impl TodoList {
             );
         }
     }
+
+    fn remove_todo(&mut self, id: usize) -> bool {
+        let initial_len = self.todos.len();
+        self.todos.retain(|t| t.id != id);
+        self.todos.len() < initial_len
+    }
 }
 
 // NOTE: function to save todos from the vector to a json file.
@@ -123,10 +129,25 @@ fn main() -> io::Result<()> {
                 } else {
                     println!("Todo not found!");
                 }
+            } else {
+                println!("Invalid ID");
             }
         }
         "3" => {
-            println!("Your choice is 3. Remove Todo.");
+            println!("3. Enter the id of the todo to be removed.");
+            let mut id = String::new();
+            io::stdin()
+                .read_line(&mut id)
+                .expect("Failed to read input.");
+            if let Ok(id) = id.trim().parse() {
+                if todo_list.remove_todo(id) {
+                    println!("Todo Removed");
+                } else {
+                    println!("Todo not found!");
+                }
+            } else {
+                println!("Invalid ID");
+            }
         }
         "4" => {
             println!("4. List all todos");
