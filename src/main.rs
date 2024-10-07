@@ -61,7 +61,9 @@ fn load_todos() -> io::Result<TodoList> {
     }
 }
 
-fn main() {
+fn main() -> io::Result<()> {
+    let mut todo_list = load_todos()?;
+
     // NOTE: Give the user some brief insturctions using println for now.
     println!("\nTodo CLI!");
     println!("1. Add new Todo");
@@ -86,6 +88,7 @@ fn main() {
             io::stdin()
                 .read_line(&mut title)
                 .expect("Failed to read input.");
+            todo_list.add_todo(title.trim().to_string());
             println!("Todo Added.");
         }
         "2" => {
@@ -104,4 +107,7 @@ fn main() {
             println!("Invalid Choice.")
         }
     }
+    save_todos(&todo_list)?;
+
+    Ok(())
 }
